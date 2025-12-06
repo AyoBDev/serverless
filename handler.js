@@ -1,10 +1,39 @@
 'use strict';
+const {DynamoDBClient} = require('@aws-sdk/client-dynamodb');
+const client = new DynamoDBClient({ region: 'us-east-1' });
+const {DynamoDBDocumentClient, PutCommand} = require('@aws-sdk/lib-dynamodb');
+const ddbDocClient = DynamoDBDocumentClient.from(client);
+
 
 module.exports.createNote = async (event) => {
-  return {
+  let data = JSON.parse(event.body);
+
+  try {
+    await ddbDocClient.send(
+      new PutCommand({
+        TableName: "notes",
+        Item: {
+          noteId: crypto.randomUUID(),
+          title: data.title,
+          body: data.body
+        },
+      ConditionExpression: "attribute_not_exists(noteId)"
+    })
+    
+   );
+
+    return {
     statusCode: 201,
     body: JSON.stringify("New Note created successfully!"),
-  };
+    };
+
+  } catch(err) {
+    return {
+    statusCode: 400,
+    body: JSON.stringify(err.message),
+    };
+  }
+ 
 };
 
 module.exports.updateNote = async (event) => {
