@@ -4,3 +4,5 @@ jspm_packages
 
 # Serverless directories
 .serverless
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md
